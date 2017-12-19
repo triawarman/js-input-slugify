@@ -1,0 +1,50 @@
+(function ($) {
+    $.fn.slugify = function (source, options, enable) {
+        var $target = this;
+        var $source = $(source);
+
+        var settings = $.extend({
+            allowCharracters: /([\w+#_\-\s]+)/ig,
+            swapSpaceWith: "_"
+        }, options);
+        
+        function watcher (e) {
+            if($.fn.slugify.enable == true){
+                if(($.fn.slugify.copySlugToTarget == true) || ($(e.currentTarget)[0] == $(source)[0]) == false){
+            
+                    //var str = $(this).val().toLowerCase().replace(/\s+/g, settings.swapSpaceWith).replace(/_+/g, '_').replace(/^_|_$/g, '');
+                    var regexCond1 = new RegExp(settings.swapSpaceWith, 'g');
+                    var regexCond2 = new RegExp('^'+settings.swapSpaceWith+'|'+settings.swapSpaceWith+'$', 'g');
+                    
+                    var str = $(this).val().toLowerCase().replace(/\s+/g, settings.swapSpaceWith);
+                    str = str.match(settings.allowCharracters);
+                    var sentence = "";
+                    
+                    if(str !== null){
+                        for(var i = 0; i < str.length; i++){
+                            sentence += str[i]+settings.swapSpaceWith;
+                        }
+                    }
+
+                    sentence = sentence.replace(regexCond1, '_').replace(regexCond2, '');
+                    $target.each( function(){
+                        elemenIsinput = $(this).is('input') || $(this).is('textarea');
+                        if (elemenIsinput) {
+                            $(this).val(sentence);
+                        } else {
+                            $(this).text(sentence);
+                        }
+                    })
+                }
+            }
+        };
+        
+        $source.keyup(watcher).change(watcher);
+        $target.change(watcher);
+        
+        return this;
+    };
+    
+    $.fn.slugify.enable = true;
+    $.fn.slugify.copySlugToTarget = true;
+})(jQuery);
